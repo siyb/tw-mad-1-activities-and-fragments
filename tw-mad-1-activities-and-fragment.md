@@ -15,6 +15,7 @@
 * Android Fundamentals
 * Introduction: Components
 * Activity
+* Fragments
 
 # Introduction
 
@@ -323,3 +324,94 @@ public class GatheringActivity extends Activity {
   } 
 }
 ```
+
+# Fragments
+
+## Fragments - 1 - Resources
+
+* Lesson: http://developer.android.com/guide/topics/fundamentals/fragments.html
+* Javadoc:
+    * [http://developer.android.com/reference/android/app/Fragment.html](http://developer.android.com/reference/android/app/Fragment.html)
+    * [http://developer.android.com/reference/android/app/FragmentManager.html](http://developer.android.com/reference/android/app/FragmentManager.html)
+    * [http://developer.android.com/reference/android/app/FragmentTransaction.html](http://developer.android.com/reference/android/app/FragmentTransaction.html)
+
+## Fragments - 2 - Basics
+
+* Fragments were introduced in honeycomb
+    * but you can use them in older Android versions (and I suggest you do) -> support library!
+* Their primary use is to fragment Activities for reuse purposes
+
+## Fragments - 3 - Simple Usecase
+
+![Fragments and Form Factors](./fragments_view.png)
+
+## Fragments - 4 - Information
+
+* Basically they are lightweight Activities (although fragments don't need to provide views)
+* Fragments are no Android components but …
+* … as Activities, they do have a lifecycle with similar methods as the ones present in Activities
+* Unlike Activities, which are defined in the manifest and handled by the Android framework, Fragments are used like views (in layouts)
+* Fragments may or may not define a layout
+
+## Fragments - 5 - Information cont.
+
+* The Fragment stack can be modified (not possible with the Activity)
+* Fragments cannot be accessed the way you access views (no findViewById(...))
+    * Android provides the FragmentManager for this reason (getFragmentManager() or getSupportFragmentManager())
+* Using the Fragment implementation of honeycomb+ is slightly different than using the one provided by the support library
+    * I suggest to use the implementation provided by the support library, so that you get bugfixes / new features
+
+## Fragments - 6 - Lifecycle
+
+![Fragments and Form Factors](./fragments_lifecycle.png)
+
+## Fragments - 7 - Lifecylce Methods
+
+* onCreate() - create essential components here
+* onCreateView() - needs to return the view to be displayed in the Fragment (or null if you don't want your fragment to show a view)
+* onPause() - called on first indication of user leaving Fragment
+
+## Fragments - 8 - Transactions
+
+* FragmentManager offers means to provide Fragment transactions
+* Very similar to database transactions
+    * A transaction can be started using the FragmentManager: getFragmentManager().beginTransaction();
+    * Within the transaction, one can: show, hide, remove, replace, attach, detach, ... Fragments
+    * Once you are done you need to use FragmentTransaction.commit(), to commit the changes you've made
+
+* Transactions grant several freedoms:
+    * You may decide to push a transaction to the backstack, essentially controlling how the user is guided trough your App (back button)
+    * You may observe the backstack and react on changes
+    * You may pop or only get an item from the backstack
+
+## Fragments - 9 - Important Methods
+
+* These methods should be used to check the Fragment’s internal state in order to avoid grave errors in your software
+* isAdded() – check if the Fragment is currently added to its Activity
+* isDetached() – check if the Fragment has been explicitly detached from the UI
+* isRemoving() – check if the Fragment is currently being removed from the Activity
+* isResumed() – most important method of all – check if the Fragment is in the resumed state (see lifecycle)
+* isVisible() – check if the Fragment is currently visible to the user, DOES NOT WORK AS EXPECTED!
+
+## Fragments - 12 - Fragment nesting
+
+* As of Android 4.2, Fragment nesting finally works … (using a Fragment in another Fragment)
+    * This wasn’t possible before and caused a lot of problems
+    * Programmers could not work as modular as they wanted to
+* Fragment nesting also works when you are using the support library
+* Working with nested Fragments is kinda hacky, since Google did decide not to implement the feature when Fragments were introduced
+
+## Fragments - 13 - Fragment nesting cont.
+
+* Instead of using getFragmentManager() or getSupportFragmentManager() you will need to use getChildFragmentManager() to obtain an instance of FragmentManager!
+* getChildFragmentManager() can only be called from within the Fragment, not an Activity
+* Make sure to use getChildFragmentManager() (can’t stress this enough!) otherwise you will end up with strange behaviour that is extremely hard to debug…
+* There is another downside…
+
+## Fragments - 14 - Fragment nesting cont.
+
+* [http://stackoverflow.com/questions/15207305/getting-the-error-java-lang-illegalstateexception-activity-has-been-destroyed/15656428#15656428](http://stackoverflow.com/questions/15207305/getting-the-error-java-lang-illegalstateexception-activity-has-been-destroyed/15656428#15656428)
+* It seems that the newly added API is faulty, when detaching a nested Fragment (internal state is messed up)
+* Check out the code snippet, it explains how to use reflections to clean up the state manually
+
+# Any Questions?
